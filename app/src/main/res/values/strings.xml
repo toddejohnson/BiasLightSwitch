@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">BiasLightSwitch</string>
+    <string name="browse_title">Bias Light Switch</string>
+    <string name="channel_name">BiasService</string>
+    <string name="channel_description">Bias Light Switch Service</string>
+    <string name="notification_title">Bias Light Switch Service</string>
+    <string name="notification_message">Bias Light Switch Service</string>
+    <string name="notification_ticker">Bias Light Switch Service</string>
+
+    <string name="start_stop">Start/Stop Service</string>
+    <string name="turn_on">Turn On</string>
+    <string name="turn_off">Turn Off</string>
+
+    <!-- Error messages -->
+    <string name="error_fragment_message">An error occurred</string>
+    <string name="dismiss_error">Dismiss</string>
+</resources>
