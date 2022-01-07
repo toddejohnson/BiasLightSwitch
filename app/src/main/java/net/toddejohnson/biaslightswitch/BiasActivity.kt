@@ -2,6 +2,7 @@ package net.toddejohnson.biaslightswitch
 
 import android.content.Context
 import android.content.Intent
+import android.hardware.usb.UsbManager
 import android.os.Bundle
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
@@ -45,6 +46,17 @@ class BiasActivity : FragmentActivity() {
             startForegroundService(intent)
         }
         toast("Bias Light Off")
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        when (intent?.action) {
+            UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
+                val serviceIntent = Intent(this, BiasService::class.java)
+                serviceIntent.action = intent.action
+                this.startForegroundService(serviceIntent)
+            }
+        }
     }
 
 }

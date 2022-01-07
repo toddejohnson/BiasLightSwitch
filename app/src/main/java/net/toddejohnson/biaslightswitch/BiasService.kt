@@ -13,8 +13,9 @@ import com.hoho.android.usbserial.driver.UsbSerialDriver
 import com.hoho.android.usbserial.driver.UsbSerialPort
 import com.hoho.android.usbserial.driver.UsbSerialProber
 
-const val ACTION_BIAS_ON = "net.toddejohnson.net.biaslightswitch.BIAS_ON"
-const val ACTION_BIAS_OFF = "net.toddejohnson.net.biaslightswitch.BIAS_OFF"
+const val ACTION_BIAS_ON = "net.toddejohnson.biaslightswitch.BIAS_ON"
+const val ACTION_BIAS_OFF = "net.toddejohnson.biaslightswitch.BIAS_OFF"
+const val ACTION_BIAS_USB_PERMISSION = "net.toddejohnson.biaslightswitch.USB_PERMISSION"
 
 class BiasService : Service() {
     private val vTag = "BiasService"
@@ -99,6 +100,16 @@ class BiasService : Service() {
                 startReceiver()
                 Log.d(vTag,"Finished boot completed")
             }
+            UsbManager.ACTION_USB_DEVICE_ATTACHED -> {
+                if (!isDeviceConnected) {
+                    setupUSB()
+                }
+            }
+            ACTION_BIAS_USB_PERMISSION -> {
+                setupUSBPermissions()
+                checkCurrentState()
+                Log.d(vTag, "USB Permission Service Intent Complete")
+            }
             ACTION_BIAS_OFF ->{switchRelay(false)}
             ACTION_BIAS_ON ->{switchRelay(true)}
             else -> {
@@ -112,6 +123,7 @@ class BiasService : Service() {
         val intentFilter = IntentFilter()
         intentFilter.addAction(Intent.ACTION_SCREEN_ON)
         intentFilter.addAction(Intent.ACTION_SCREEN_OFF)
+        intentFilter.addAction(ACTION_BIAS_USB_PERMISSION)
         registerReceiver(biasReceiver,intentFilter)
         Log.d(vTag, "Receiver Listening")
     }
@@ -147,15 +159,9 @@ class BiasService : Service() {
     }
     private fun setupUSBPermissions():Boolean {
         if (!usbManager.hasPermission(usbSerialDriver.device)) {
-            val pendingIntent: PendingIntent =
-                Intent(this, BiasActivity::class.java).let { notificationIntent ->
-                    PendingIntent.getActivity(
-                        this,
-                        0,
-                        notificationIntent,
-                        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                    )
-                }
+            val intent = Intent(this,BiasService::class.java)
+            intent.action = ACTION_BIAS_USB_PERMISSION
+            val pendingIntent = PendingIntent.getService(this,0,intent,PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             usbManager.requestPermission(usbSerialDriver.device, pendingIntent)
             Log.w(vTag, "Requested permissions")
             return false
