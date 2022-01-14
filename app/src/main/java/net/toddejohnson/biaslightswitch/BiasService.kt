@@ -71,6 +71,10 @@ class BiasService : Service() {
     }
 
     private fun checkCurrentState(){
+        if(!isDeviceConnected){
+            Log.e(vTag,"Can't do anything with check current state without device")
+            return
+        }
         if(!setupUSBPermissions()){
             Log.e(vTag,"Can't do anything with check current state without permissions")
             return
@@ -158,6 +162,9 @@ class BiasService : Service() {
         checkCurrentState()
     }
     private fun setupUSBPermissions():Boolean {
+        if(!isDeviceConnected){
+            return false
+        }
         if (!usbManager.hasPermission(usbSerialDriver.device)) {
             val intent = Intent(this,BiasService::class.java)
             intent.action = ACTION_BIAS_USB_PERMISSION
