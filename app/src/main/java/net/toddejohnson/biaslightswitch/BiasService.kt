@@ -72,8 +72,12 @@ class BiasService : Service() {
 
     private fun checkCurrentState(){
         if(!isDeviceConnected){
-            Log.e(vTag,"Can't do anything with check current state without device")
-            return
+            Log.w(vTag,"Can't do anything with check current state without device. Connecting...")
+            setupUSB()
+            if(!isDeviceConnected){
+                Log.e(vTag,"Can't do anything with check current state without device. Connection failed")
+                return
+            }
         }
         if(!setupUSBPermissions()){
             Log.e(vTag,"Can't do anything with check current state without permissions")
@@ -178,8 +182,12 @@ class BiasService : Service() {
 
     private fun switchRelay(on:Boolean){
         if(!isDeviceConnected){
-            Log.e(vTag,"Device not connected when calling switchRelay")
-            return
+            Log.w(vTag,"Device not connected when calling switchRelay. Trying...")
+            setupUSB()
+            if(!isDeviceConnected){
+                Log.e(vTag,"Device not connected when calling switchRelay. Connection attempted")
+                return
+            }
         }
         if(!setupUSBPermissions()){
             Log.e(vTag,"Can't switchRelay without permissions")
